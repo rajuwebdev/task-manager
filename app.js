@@ -8,6 +8,16 @@ let tasks = require("./task.json").tasks;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+function parseTaskId(value) {
+  if (!/^[1-9]\d*$/.test(value)) {
+    return null;
+  }
+
+  const id = Number(value);
+
+  return Number.isSafeInteger(id) ? id : null;
+}
+
 // GET /tasks - Get all tasks, with optional filtering
 app.get("/tasks", (req, res) => {
   let filteredTasks = tasks;
@@ -28,11 +38,11 @@ app.get("/tasks", (req, res) => {
 
 // GET /tasks/:id - Get a task by ID
 app.get("/tasks/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseTaskId(req.params.id);
 
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(404).json({
-      message: "Task not found",
+  if (id === null) {
+    return res.status(400).json({
+      message: "Invalid task ID",
     });
   }
 
@@ -78,11 +88,11 @@ app.post("/tasks", (req, res) => {
 
 // PUT /tasks/:id - Update an existing task
 app.put("/tasks/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseTaskId(req.params.id);
 
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(404).json({
-      message: "Task not found",
+  if (id === null) {
+    return res.status(400).json({
+      message: "Invalid task ID",
     });
   }
 
@@ -117,11 +127,11 @@ app.put("/tasks/:id", (req, res) => {
 
 // DELETE /tasks/:id - Delete a task
 app.delete("/tasks/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseTaskId(req.params.id);
 
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(404).json({
-      message: "Task not found",
+  if (id === null) {
+    return res.status(400).json({
+      message: "Invalid task ID",
     });
   }
 
